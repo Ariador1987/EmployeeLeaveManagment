@@ -1,4 +1,5 @@
 using EmployeeLeaveManagment.Web.Data;
+using EmployeeLeaveManagment.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +11,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddScoped<LeaveType>();
+builder.Services.AddScoped<LeaveAllocation>();
+
+//builder.Services.AddTransient<Employee>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
