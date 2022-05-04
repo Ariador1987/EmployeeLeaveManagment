@@ -1,23 +1,32 @@
+using AutoMapper;
+using EmployeeLeaveManagment.Web.Configurations;
+using EmployeeLeaveManagment.Web.Contracts;
 using EmployeeLeaveManagment.Web.Data;
 using EmployeeLeaveManagment.Web.Models;
+using EmployeeLeaveManagment.Web.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");;
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));;
+
+builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>();;
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-builder.Services.AddScoped<LeaveType>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<ILeaveTypeRepository, LeaveTypeRepository>();
 builder.Services.AddScoped<LeaveAllocation>();
+builder.Services.AddAutoMapper(typeof(MapperConfig));
 
-//builder.Services.AddTransient<Employee>();
+builder.Services.AddTransient<Employee>();
 
 builder.Services.AddControllersWithViews();
 
